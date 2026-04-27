@@ -1,0 +1,166 @@
+{
+  "name": "AI Career Path Predictor",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "9a078641-7d94-4c4e-b592-64d103952b7b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b79f567f-52e5-4ee3-aece-c34f6ba9e6cc",
+              "name": "prompt",
+              "value": "=User Skills: {{ $json.body.skills }} Interests: {{ $json.body.interests }} Education: {{ $json.body.education }}  Generate 3 career paths.  For EACH: - Title - Why it fits - Required skills - Step-by-step roadmap  Also include: - Top 5 skills to start this week  IMPORTANT: Return ONLY clean HTML (no <html>, no <head>, no <style>)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        -32
+      ],
+      "id": "ac46adb6-7fea-45fc-bc5d-ad8a9ff44d85",
+      "name": "Edit Fields",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "notes": "shows cleen output\n\n"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        272,
+        144
+      ],
+      "id": "03e7ae2c-2b7e-49bf-a25b-827c587b8c64",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "6VRi93bRvqGFjAQY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "career-predictor",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "924f1256-1617-4f48-b832-fda445e4f5d4",
+      "name": "Webhook",
+      "webhookId": "e15a5281-cfb6-4dd3-9f5b-dba4e71337ab",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "318491cc-f392-471e-a3ae-a15555d41103",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -32
+      ],
+      "id": "82ec4683-28b2-4125-952f-cd7cefcaa0b2",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ae35baa9-d1f5-43d7-89e3-2770cecdbad4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "08a8b7974c9eb338eac68a158b5e89994d2a02050d7e209f4e3abd13fa8c035e"
+  },
+  "id": "SRYr1kQtZ8SDQd57",
+  "tags": []
+}
